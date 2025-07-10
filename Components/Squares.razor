@@ -1,0 +1,125 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<canvas @ref="canvasRef" class="w-full h-full border-none block"></canvas>
+
+<script>
+  window.initializeSquaresCanvas = (canvas, options) => {
+    const { direction, speed, borderColor, squareSize, hoverFillColor } = options;
+    const ctx = canvas.getContext("2d");
+
+    let gridOffset = { x: 0, y: 0 };
+    let hoveredSquare = null;
+    let animationFrame;
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+
+    const drawGrid = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#060010"; // dark blue background
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const startX = Math.floor(gridOffset.x / squareSize) * squareSize;
+      const startY = Math.floor(gridOffset.y / squareSize) * squareSize;
+
+      for (let x = startX; x < canvas.width + squareSize; x += squareSize) {
+        for (let y = startY; y < canvas.height + squareSize; y += squareSize) {
+          const squareX = x - (gridOffset.x % squareSize);
+          const squareY = y - (gridOffset.y % squareSize);
+
+          if (
+            hoveredSquare &&
+            Math.floor((x - startX) / squareSize) === hoveredSquare.x &&
+            Math.floor((y - startY) / squareSize) === hoveredSquare.y
+          ) {
+            ctx.fillStyle = hoverFillColor;
+            ctx.fillRect(squareX, squareY, squareSize, squareSize);
+          }
+
+          ctx.strokeStyle = borderColor;
+          ctx.strokeRect(squareX, squareY, squareSize, squareSize);
+        }
+      }
+    };
+
+    const updateAnimation = () => {
+      const effectiveSpeed = Math.max(speed, 0.1);
+      switch (direction) {
+        case "right":
+          gridOffset.x = (gridOffset.x - effectiveSpeed + squareSize) % squareSize;
+          break;
+        case "left":
+          gridOffset.x = (gridOffset.x + effectiveSpeed + squareSize) % squareSize;
+          break;
+        case "up":
+          gridOffset.y = (gridOffset.y + effectiveSpeed + squareSize) % squareSize;
+          break;
+        case "down":
+          gridOffset.y = (gridOffset.y - effectiveSpeed + squareSize) % squareSize;
+          break;
+        case "diagonal":
+          gridOffset.x = (gridOffset.x - effectiveSpeed + squareSize) % squareSize;
+          gridOffset.y = (gridOffset.y - effectiveSpeed + squareSize) % squareSize;
+          break;
+      }
+
+      drawGrid();
+      animationFrame = requestAnimationFrame(updateAnimation);
+    };
+
+    const handleMouseMove = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      const startX = Math.floor(gridOffset.x / squareSize) * squareSize;
+      const startY = Math.floor(gridOffset.y / squareSize) * squareSize;
+
+      const hoveredSquareX = Math.floor((mouseX + gridOffset.x - startX) / squareSize);
+      const hoveredSquareY = Math.floor((mouseY + gridOffset.y - startY) / squareSize);
+
+      hoveredSquare = { x: hoveredSquareX, y: hoveredSquareY };
+    };
+
+    const handleMouseLeave = () => {
+      hoveredSquare = null;
+    };
+
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("resize", resizeCanvas);
+
+    resizeCanvas();
+    requestAnimationFrame(updateAnimation);
+  };
+</script>
+
+
+@code {
+    private ElementReference canvasRef;
+
+    [Parameter] public string Direction { get; set; } = "right";
+    [Parameter] public double Speed { get; set; } = 1.0;
+    [Parameter] public string BorderColor { get; set; } = "#999";
+    [Parameter] public int SquareSize { get; set; } = 40;
+    [Parameter] public string HoverFillColor { get; set; } = "#222";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initializeSquaresCanvas", canvasRef, new
+            {
+                direction = Direction,
+                speed = Speed,
+                borderColor = BorderColor,
+                squareSize = SquareSize,
+                hoverFillColor = HoverFillColor
+            });
+        }
+    }
+}
