@@ -1,5 +1,41 @@
 ﻿@page "/"
 
-<div class="w-screen h-screen flex items-center justify-center bg-black">
+<div class="w-screen h-screen bg-black relative">
+    <!-- Main Content -->
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 1rem;">
+        
+        <!-- Text Section -->
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; text-align: center;">
+            <span style="color: white; font-weight: 800; font-size: clamp(1.5rem, 5vw, 3rem); line-height: 1.2;">
+               Parse Torrent Files
+            </span>
+        </div>
+
+        <!-- Upload Button -->
+        <label style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #7739e9 0%, #4f269c 100%); border-radius: clamp(25px, 5vw, 50px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); cursor: pointer; padding: clamp(12px, 3vw, 16px) clamp(20px, 5vw, 28px); gap: clamp(8px, 2vw, 12px); color: white; font-weight: 600; font-size: clamp(14px, 3.5vw, 18px); transition: all 0.3s ease;"
+               ondragover="event.preventDefault(); this.style.background='linear-gradient(135deg, #8b4ced 0%, #6a30a8 100%)'; this.style.transform='scale(1.02)'"
+               ondragleave="this.style.background='linear-gradient(135deg, #7739e9 0%, #4f269c 100%)'; this.style.transform='scale(1)'"
+               ondrop="event.preventDefault(); this.style.background='linear-gradient(135deg, #7739e9 0%, #4f269c 100%)'; this.style.transform='scale(1)'; 
+                       const files = event.dataTransfer.files; 
+                       if (files.length > 0) { 
+                           const fileInput = this.querySelector('input[type=file]'); 
+                           fileInput.files = files; 
+                           console.log('File dropped:', files[0].name); 
+                       }">
+            
+            <!-- File Badge Part (Left side) -->
+            <div style="background-color: #000000; padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px); color: white; font-weight: 600; font-size: clamp(12px, 2.5vw, 14px); display: flex; align-items: center; gap: clamp(4px, 1vw, 6px); border-radius: clamp(20px, 4vw, 50px);">
+                <svg style="width: clamp(14px, 3vw, 16px); height: clamp(14px, 3vw, 16px); fill: currentColor;" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                Drag
+            </div>
+            
+            <!-- Upload Text -->
+            Upload a file
+            <input type="file" style="display: none;" onchange="console.log('File selected:', this.files[0]?.name)" />
+        </label>
+    </div>
+    <!-- Background Canvas -->
     <Squares Direction="diagonal" Speed="0.5" SquareSize="60" BorderColor="#271e37" HoverFillColor="#060010" />
 </div>
