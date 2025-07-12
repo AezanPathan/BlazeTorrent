@@ -36,6 +36,109 @@
             <input type="file" style="display: none;" onchange="console.log('File selected:', this.files[0]?.name)" />
         </label>
     </div>
+   <!-- Floating Action Button Group -->
+<div class="fab-container">
+  <button class="fab-main-btn" @onclick="ToggleFab">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <div class="fab-actions" id="fabActions" style="display: none;">
+    <a href="https://github.com" target="_blank" class="fab-action-btn" title="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+    <a href="#" class="fab-action-btn" title="Download">
+      <i class="fas fa-download"></i>
+    </a>
+    <a href="#" class="fab-action-btn" title="Settings">
+      <i class="fas fa-cog"></i>
+    </a>
+  </div>
+</div>
     <!-- Background Canvas -->
     <Squares Direction="diagonal" Speed="0.5" SquareSize="60" BorderColor="#271e37" HoverFillColor="#060010" />
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+  .fab-container {
+    position: fixed;
+    bottom: clamp(16px, 3vw, 32px);
+    right: clamp(16px, 3vw, 32px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .fab-main-btn {
+    width: clamp(44px, 10vw, 56px);
+    height: clamp(44px, 10vw, 56px);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: clamp(16px, 4vw, 20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    order: 2;
+  }
+
+  .fab-main-btn:hover {
+    background: rgba(124, 58, 237, 0.8);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+  }
+
+  .fab-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 2vw, 12px);
+    margin-bottom: clamp(10px, 2vw, 16px);
+    order: 1;
+  }
+
+  .fab-action-btn {
+    width: clamp(36px, 9vw, 44px);
+    height: clamp(36px, 9vw, 44px);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: clamp(14px, 4vw, 18px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .fab-action-btn:hover {
+    background: rgba(124, 58, 237, 0.8);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+  }
+</style>
+@code {
+    private bool showActions = false;
+
+    private void ToggleFab()
+    {
+        showActions = !showActions;
+
+        var displayValue = showActions ? "flex" : "none";
+        JS.InvokeVoidAsync("eval", $"document.getElementById('fabActions').style.display = '{displayValue}';");
+    }
+
+    [Inject]
+    private IJSRuntime JS { get; set; }
+}
+
