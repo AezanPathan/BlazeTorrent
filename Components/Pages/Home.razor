@@ -39,7 +39,7 @@
    <!-- Floating Action Button Group -->
 <div class="fab-container">
   <button class="fab-main-btn" @onclick="ToggleFab">
-    <i class="fas fa-plus"></i>
+    <i class="fas fa-plus" id="fabIcon"></i>
   </button>
 
   <div class="fab-actions" id="fabActions" style="display: none;">
@@ -73,25 +73,32 @@
     width: clamp(44px, 10vw, 56px);
     height: clamp(44px, 10vw, 56px);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(124, 58, 237, 0.6);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(124, 58, 237, 0.8);
     font-size: clamp(16px, 4vw, 20px);
     display: flex;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(10px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
     cursor: pointer;
     transition: all 0.3s ease;
     order: 2;
   }
 
   .fab-main-btn:hover {
-    background: rgba(124, 58, 237, 0.8);
-    color: white;
+    background: rgba(124, 58, 237, 0.9);
     transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.5);
+  }
+
+  .fab-main-btn i {
+    transition: transform 0.3s ease;
+  }
+
+  .fab-main-btn.active i {
+    transform: rotate(45deg);
   }
 
   .fab-actions {
@@ -107,15 +114,15 @@
     width: clamp(36px, 9vw, 44px);
     height: clamp(36px, 9vw, 44px);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(124, 58, 237, 0.4);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(124, 58, 237, 0.6);
     font-size: clamp(14px, 4vw, 18px);
     display: flex;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(8px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
     text-decoration: none;
     transition: all 0.3s ease;
   }
@@ -135,7 +142,10 @@
         showActions = !showActions;
 
         var displayValue = showActions ? "flex" : "none";
+        var activeClass = showActions ? "active" : "";
+        
         JS.InvokeVoidAsync("eval", $"document.getElementById('fabActions').style.display = '{displayValue}';");
+        JS.InvokeVoidAsync("eval", $"document.querySelector('.fab-main-btn').className = 'fab-main-btn {activeClass}';");
     }
 
     [Inject]
