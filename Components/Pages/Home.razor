@@ -3,11 +3,11 @@
 <div class="w-screen h-screen bg-black relative">
     <!-- Main Content -->
     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 1rem;">
-        
+
         <!-- Text Section -->
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; text-align: center;">
             <span style="color: white; font-weight: 800; font-size: clamp(1.5rem, 5vw, 3rem); line-height: 1.2;">
-               Parse Torrent Files
+                Parse Torrent Files
             </span>
         </div>
 
@@ -15,124 +15,127 @@
         <label style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #7739e9 0%, #4f269c 100%); border-radius: clamp(25px, 5vw, 50px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); cursor: pointer; padding: clamp(12px, 3vw, 16px) clamp(20px, 5vw, 28px); gap: clamp(8px, 2vw, 12px); color: white; font-weight: 600; font-size: clamp(14px, 3.5vw, 18px); transition: all 0.3s ease;"
                ondragover="event.preventDefault(); this.style.background='linear-gradient(135deg, #8b4ced 0%, #6a30a8 100%)'; this.style.transform='scale(1.02)'"
                ondragleave="this.style.background='linear-gradient(135deg, #7739e9 0%, #4f269c 100%)'; this.style.transform='scale(1)'"
-               ondrop="event.preventDefault(); this.style.background='linear-gradient(135deg, #7739e9 0%, #4f269c 100%)'; this.style.transform='scale(1)'; 
-                       const files = event.dataTransfer.files; 
-                       if (files.length > 0) { 
-                           const fileInput = this.querySelector('input[type=file]'); 
-                           fileInput.files = files; 
-                           console.log('File dropped:', files[0].name); 
-                       }">
-            
+               ondrop="event.preventDefault(); this.style.background='linear-gradient(135deg, #7739e9 0%, #4f269c 100%)'; this.style.transform='scale(1)';
+               const files=event.dataTransfer.files;
+               if (files.length>
+            0) {
+            const fileInput = this.querySelector('input[type=file]');
+            fileInput.files = files;
+            console.log('File dropped:', files[0].name);
+            }">
+
             <!-- File Badge Part (Left side) -->
             <div style="background-color: #000000; padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px); color: white; font-weight: 600; font-size: clamp(12px, 2.5vw, 14px); display: flex; align-items: center; gap: clamp(4px, 1vw, 6px); border-radius: clamp(20px, 4vw, 50px);">
                 <svg style="width: clamp(14px, 3vw, 16px); height: clamp(14px, 3vw, 16px); fill: currentColor;" viewBox="0 0 24 24">
-                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                 </svg>
                 Drag
             </div>
-            
+
             <!-- Upload Text -->
-            Upload a file
-            <input type="file" style="display: none;" onchange="console.log('File selected:', this.files[0]?.name)" />
+            @displayFileName
+            <InputFile style="display: none;" OnChange="OnInputFileChanged" />
+
+            @* <input type="file" style="display: none;" onchange="console.log('File selected:', this.files[0]?.name)" /> *@
         </label>
     </div>
-   <!-- Floating Action Button Group -->
-<div class="fab-container">
-  <button class="fab-main-btn" @onclick="ToggleFab">
-    <i class="fas fa-plus" id="fabIcon"></i>
-  </button>
+    <!-- Floating Action Button Group -->
+    <div class="fab-container">
+        <button class="fab-main-btn" @onclick="ToggleFab">
+            <i class="fas fa-plus" id="fabIcon"></i>
+        </button>
 
-  <div class="fab-actions" id="fabActions" style="display: none;">
-    <a href="https://github.com" target="_blank" class="fab-action-btn" title="GitHub">
-      <i class="fab fa-github"></i>
-    </a>
-    <a href="#" class="fab-action-btn" title="Download">
-      <i class="fas fa-download"></i>
-    </a>
-    <a href="#" class="fab-action-btn" title="Settings">
-      <i class="fas fa-cog"></i>
-    </a>
-  </div>
-</div>
+        <div class="fab-actions" id="fabActions" style="display: none;">
+            <a href="https://github.com/AezanPathan" target="_blank" class="fab-action-btn" title="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="#" class="fab-action-btn" title="Download">
+                <i class="fas fa-download"></i>
+            </a>
+            <a href="#" class="fab-action-btn" title="Settings">
+                <i class="fas fa-cog"></i>
+            </a>
+        </div>
+    </div>
     <!-- Background Canvas -->
     <Squares Direction="diagonal" Speed="0.5" SquareSize="60" BorderColor="#271e37" HoverFillColor="#060010" />
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-  .fab-container {
-    position: fixed;
-    bottom: clamp(16px, 3vw, 32px);
-    right: clamp(16px, 3vw, 32px);
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    .fab-container {
+        position: fixed;
+        bottom: clamp(16px, 3vw, 32px);
+        right: clamp(16px, 3vw, 32px);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-  .fab-main-btn {
-    width: clamp(44px, 10vw, 56px);
-    height: clamp(44px, 10vw, 56px);
-    border-radius: 50%;
-    background: rgba(124, 58, 237, 0.6);
-    color: white;
-    border: 1px solid rgba(124, 58, 237, 0.8);
-    font-size: clamp(16px, 4vw, 20px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    order: 2;
-  }
+    .fab-main-btn {
+        width: clamp(44px, 10vw, 56px);
+        height: clamp(44px, 10vw, 56px);
+        border-radius: 50%;
+        background: rgba(124, 58, 237, 0.6);
+        color: white;
+        border: 1px solid rgba(124, 58, 237, 0.8);
+        font-size: clamp(16px, 4vw, 20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        order: 2;
+    }
 
-  .fab-main-btn:hover {
-    background: rgba(124, 58, 237, 0.9);
-    transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.5);
-  }
+        .fab-main-btn:hover {
+            background: rgba(124, 58, 237, 0.9);
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.5);
+        }
 
-  .fab-main-btn i {
-    transition: transform 0.3s ease;
-  }
+        .fab-main-btn i {
+            transition: transform 0.3s ease;
+        }
 
-  .fab-main-btn.active i {
-    transform: rotate(45deg);
-  }
+        .fab-main-btn.active i {
+            transform: rotate(45deg);
+        }
 
-  .fab-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(8px, 2vw, 12px);
-    margin-bottom: clamp(10px, 2vw, 16px);
-    order: 1;
-  }
+    .fab-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(8px, 2vw, 12px);
+        margin-bottom: clamp(10px, 2vw, 16px);
+        order: 1;
+    }
 
-  .fab-action-btn {
-    width: clamp(36px, 9vw, 44px);
-    height: clamp(36px, 9vw, 44px);
-    border-radius: 50%;
-    background: rgba(124, 58, 237, 0.4);
-    color: white;
-    border: 1px solid rgba(124, 58, 237, 0.6);
-    font-size: clamp(14px, 4vw, 18px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
-    text-decoration: none;
-    transition: all 0.3s ease;
-  }
+    .fab-action-btn {
+        width: clamp(36px, 9vw, 44px);
+        height: clamp(36px, 9vw, 44px);
+        border-radius: 50%;
+        background: rgba(124, 58, 237, 0.4);
+        color: white;
+        border: 1px solid rgba(124, 58, 237, 0.6);
+        font-size: clamp(14px, 4vw, 18px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
 
-  .fab-action-btn:hover {
-    background: rgba(124, 58, 237, 0.8);
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
-  }
+        .fab-action-btn:hover {
+            background: rgba(124, 58, 237, 0.8);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+        }
 </style>
 @code {
     private bool showActions = false;
@@ -143,7 +146,7 @@
 
         var displayValue = showActions ? "flex" : "none";
         var activeClass = showActions ? "active" : "";
-        
+
         JS.InvokeVoidAsync("eval", $"document.getElementById('fabActions').style.display = '{displayValue}';");
         JS.InvokeVoidAsync("eval", $"document.querySelector('.fab-main-btn').className = 'fab-main-btn {activeClass}';");
     }
