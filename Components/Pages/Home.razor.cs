@@ -8,16 +8,24 @@ public partial class Home : ComponentBase
     protected string FileInfo = "";
     private string displayFileName = "Upload a file";
 
-    // protected async Task OnInputFileChanged(ChangeEventArgs e)
-    // {
+    //alert 
 
-    //     if (e.Value is not null && e.Value is string == false)
-    //     {
-    //         // e.Value is not useful for file upload here
-    //         FileInfo = "File selected, but input type='file' needs InputFile component in Blazor.";
-    //     }
-    // }
-      private async Task OnInputFileChanged(InputFileChangeEventArgs e)
+    private string? alertMessage;
+    private string? alertClass;
+
+    private void CloseAlert()
+    {
+        alertMessage = "";
+        alertClass = "";
+    }
+
+    private void ShowAlert(string message, string type = "info")
+    {
+        alertMessage = message;
+        alertClass = type;
+    }
+
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null)
@@ -27,10 +35,23 @@ public partial class Home : ComponentBase
             var ext = Path.GetExtension(name);
             var baseName = Path.GetFileNameWithoutExtension(name);
 
-            if (baseName.Length > 5)
-                displayFileName = baseName.Substring(0, 5) + "..." + ext;
+            displayFileName = baseName.Length > 5 ? baseName.Substring(0, 5) + "..." + ext : name;
+
+            if (ext != ".torrent")
+            {
+                alertMessage = "Please upload torrent file.";
+                alertClass = "alert-danger";
+            }
             else
-                displayFileName = name;
+            {
+                alertMessage = "Thanks for the torrent file.";
+                alertClass = "alert-success";
+            }
+        
+            // if (baseName.Length > 5)
+            //     displayFileName = baseName.Substring(0, 5) + "..." + ext;
+            // else
+            //     displayFileName = name;
         }
     }
 }

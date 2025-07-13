@@ -1,6 +1,48 @@
 ﻿@page "/"
 
+
 <div class="w-screen h-screen bg-black relative">
+   @*  @if (!string.IsNullOrEmpty(alertMessage))
+    {
+        <div class="alert @alertClass">
+            @alertMessage
+        </div>
+    } *@
+    @if (!string.IsNullOrEmpty(alertMessage))
+    {
+        <!-- Modern Alert Modal -->
+        <div class="alert-overlay" @onclick="CloseAlert">
+            <div class="alert-modal @alertClass" @onclick:stopPropagation="true">
+                <div class="alert-header">
+                    <div class="alert-icon">
+                        @if (alertClass.Contains("success"))
+                        {
+                            <i class="fas fa-check-circle"></i>
+                        }
+                        else if (alertClass.Contains("error"))
+                        {
+                            <i class="fas fa-exclamation-circle"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-info-circle"></i>
+                        }
+                    </div>
+                    <button class="alert-close" @onclick="CloseAlert">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="alert-content">
+                    @alertMessage
+                </div>
+                <div class="alert-actions">
+                    <button class="alert-btn" @onclick="CloseAlert">OK</button>
+                </div>
+            </div>
+        </div>
+    }
+
+
     <!-- Main Content -->
     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 1rem;">
 
@@ -61,7 +103,7 @@
     <Squares Direction="diagonal" Speed="0.5" SquareSize="60" BorderColor="#271e37" HoverFillColor="#060010" />
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<style>
+@* <style>
     .fab-container {
         position: fixed;
         bottom: clamp(16px, 3vw, 32px);
@@ -136,7 +178,9 @@
             transform: scale(1.1);
             box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
         }
-</style>
+
+    
+</style> *@
 @code {
     private bool showActions = false;
 
