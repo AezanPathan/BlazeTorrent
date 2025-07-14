@@ -1,3 +1,4 @@
+using BlazeTorrent.Components.Handlers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -7,6 +8,8 @@ public partial class Home : ComponentBase
 {
     protected string FileInfo = "";
     private string displayFileName = "Upload a file";
+
+    private Decoder _decoder = new Decoder();
 
     //alert 
 
@@ -42,16 +45,13 @@ public partial class Home : ComponentBase
                 alertMessage = "Please upload torrent file.";
                 alertClass = "alert-danger";
             }
+
             else
             {
+                var fileBytes = _decoder.ReadFileByte(file);
                 alertMessage = "Thanks for the torrent file.";
                 alertClass = "alert-success";
             }
-        
-            // if (baseName.Length > 5)
-            //     displayFileName = baseName.Substring(0, 5) + "..." + ext;
-            // else
-            //     displayFileName = name;
         }
     }
 }
