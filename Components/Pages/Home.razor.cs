@@ -1,4 +1,5 @@
 using BlazeTorrent.Components.Handlers;
+using CodeCrafters.Bittorrent.src;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -10,7 +11,7 @@ public partial class Home : ComponentBase
     private string displayFileName = "Upload a file";
 
     private Decoder _decoder = new Decoder();
-
+    private BencodeDecoder _bencodeDecoder = new BencodeDecoder();
     //alert 
 
     private string? alertMessage;
@@ -48,7 +49,16 @@ public partial class Home : ComponentBase
 
             else
             {
-                var fileBytes = _decoder.ReadFileByte(file);
+                var fileBytes = await _decoder.ReadFileByte(file);
+                (object result, _) = _bencodeDecoder.DecodeInput(fileBytes,0);
+
+                var meta = (Dictionary<string, object>)result;
+                var infoDict = (Dictionary<string, object>)meta["info"];
+
+                string tracker = (string)meta["announce"];
+                long length = (long)infoDict["length"];
+
+
                 alertMessage = "Thanks for the torrent file.";
                 alertClass = "alert-success";
             }
