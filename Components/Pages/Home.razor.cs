@@ -49,18 +49,50 @@ public partial class Home : ComponentBase
 
             else
             {
-                var fileBytes = await _decoder.ReadFileByte(file);
-                (object result, _) = _bencodeDecoder.DecodeInput(fileBytes,0);
+                try
+                {
+                    var fileBytes = await _decoder.ReadFileByte(file);
+                    (object result, _) = _bencodeDecoder.DecodeInput(fileBytes, 0, decodeStringsAsUtf8: true);
 
-                var meta = (Dictionary<string, object>)result;
-                var infoDict = (Dictionary<string, object>)meta["info"];
+                    var meta = (Dictionary<string, object>)result;
+                    var infoDict = (Dictionary<string, object>)meta["info"];
 
-                string tracker = (string)meta["announce"];
-                long length = (long)infoDict["length"];
+                    string tracker = (string)meta["announce"];
+                    long length = 0;
+                    
+                    // Handle different torrent structures
+                    if (infoDict.ContainsKey("length"))
+                    {
+                        length = (long)infoDict["length"];
+                    }
+                    else if (infoDict.ContainsKey("files") && infoDict["files"] is List<object> files)
+                    {
+                        // Multi-file torrent
+                        foreach (var fileObj in files)
+                        {
+                            if (fileObj is Dictionary<string, object> fileDict && fileDict.ContainsKey("length"))
+                            {
+                                length += (long)fileDict["length"];
+                            }
+                        }
+                    }
 
+                    string infoText = $"Tracker: {tracker}\nTotal Size: {length:N0} bytes";
+                    if (infoDict.ContainsKey("name"))
+                    {
+                        infoText = $"Name: {(string)infoDict["name"]}\n{infoText}";
+                    }
 
-                alertMessage = "Thanks for the torrent file.";
-                alertClass = "alert-success";
+                    FileInfo = infoText;
+                    alertMessage = "✓ Torrent file successfully parsed!";
+                    alertClass = "alert-success";
+                }
+                catch (Exception ex)
+                {
+                    alertMessage = $"Error parsing torrent: {ex.Message}";
+                    alertClass = "alert-danger";
+                    FileInfo = $"Error details: {ex.GetType().Name}";
+                }
             }
         }
     }

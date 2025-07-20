@@ -6,42 +6,41 @@ public class BencodeDecoder
 {
     private bool _decodeStringsAsUtf8 = false;
 
-    public (object Value, int Consumed) DecodeInput(byte[] input, int offset, bool decodeStringsAsUtf8 = false)
+    public (object Value, int Consumed) DecodeInput(byte[] input, int offset, bool decodeStringsAsUtf8 = false, string? currentKey = null)
     {
         _decodeStringsAsUtf8 = decodeStringsAsUtf8;
+        if (offset >= input.Length)
+            throw new ArgumentOutOfRangeException(nameof(offset), "Offset is out of bounds.");
 
         return input[offset] switch
         {
-            //>= (byte)'0' and <= (byte)'9' => DecodeString(input, offset),
-            >= (byte)'0' and <= (byte)'9' => DecodeStringOrBytes(input, offset),
             (byte)'i' => DecodeInteger(input, offset),
-            (byte)'l' => DecodeList(input, offset),
-            (byte)'d' => DecodeDictionary(input, offset),
+            (byte)'l' => DecodeList(input, offset, decodeStringsAsUtf8),
+            (byte)'d' => DecodeDictionary(input, offset, decodeStringsAsUtf8),
+            >= (byte)'0' and <= (byte)'9' =>
+                DecodeStringOrBytes(input, offset, decodeStringsAsUtf8: currentKey != "pieces" && decodeStringsAsUtf8),
             _ => throw new InvalidOperationException($"Unknown bencode type '{(char)input[offset]}' at offset {offset}")
         };
     }
 
-    private (string, int) DecodeString(byte[] data, int offset)
+    private (object, int) DecodeStringOrBytes(byte[] data, int offset, bool decodeStringsAsUtf8 = true)
     {
-        int colonIndex = Array.IndexOf(data, (byte)':', offset);
-
-        if (colonIndex != -1)
+        // Find the colon that separates length from data
+        // We need to be careful - only look for colon after consecutive digits
+        int colonPos = offset;
+        
+        // First, find where the digits end
+        while (colonPos < data.Length && data[colonPos] >= (byte)'0' && data[colonPos] <= (byte)'9')
         {
-            int length = int.Parse(Encoding.ASCII.GetString(data, offset, colonIndex - offset));
-            string value = Encoding.ASCII.GetString(data, colonIndex + 1, length);
-            return (value, colonIndex + 1 + length - offset);
+            colonPos++;
         }
-        else
-            throw new FormatException("Invalid string: missing colon" + data);
-    }
+        
+        // The next character should be a colon
+        if (colonPos >= data.Length || data[colonPos] != (byte)':')
+            throw new FormatException($"Invalid bencoded string: expected ':' after length at offset {colonPos}");
 
-    public (object, int) DecodeStringOrBytes(byte[] data, int offset, bool decodeStringsAsUtf8 = true)
-    {
-        int colonIndex = Array.IndexOf(data, (byte)':', offset);
-        if (colonIndex == -1) throw new FormatException("Invalid string: missing colon");
-
-        int length = int.Parse(Encoding.ASCII.GetString(data, offset, colonIndex - offset));
-        int valueStart = colonIndex + 1;
+        int length = int.Parse(Encoding.ASCII.GetString(data, offset, colonPos - offset));
+        int valueStart = colonPos + 1;
 
         if (decodeStringsAsUtf8)
         {
@@ -55,6 +54,7 @@ public class BencodeDecoder
             return (valueBytes, valueStart + length - offset);
         }
     }
+
     private (long, int) DecodeInteger(byte[] data, int offset)
     {
         int end = Array.IndexOf(data, (byte)'e', offset);
@@ -66,10 +66,9 @@ public class BencodeDecoder
         return (long.Parse(numStr), end - offset + 1);
     }
 
-    private (Dictionary<string, object>, int) DecodeDictionary(byte[] data, int offset)
+    private (Dictionary<string, object>, int) DecodeDictionary(byte[] data, int offset, bool parentDecodeStringsAsUtf8 = false)
     {
         var dict = new Dictionary<string, object>();
-
         int start = offset;
         offset += 1;
 
@@ -79,7 +78,9 @@ public class BencodeDecoder
             string keyString = (string)key;
             offset += keyUsed;
 
-            var (value, valUsed) = DecodeInput(data, offset);
+            bool isPiecesKey = keyString == "pieces";
+
+            var (value, valUsed) = DecodeInput(data, offset, decodeStringsAsUtf8: !isPiecesKey && parentDecodeStringsAsUtf8, currentKey: keyString);
             dict.Add(keyString, value);
             offset += valUsed;
         }
@@ -91,14 +92,15 @@ public class BencodeDecoder
         return (dict, consumed);
     }
 
-    private (List<object>, int) DecodeList(byte[] data, int offset)
+    private (List<object>, int) DecodeList(byte[] data, int offset, bool decodeStringsAsUtf8 = false)
     {
         var list = new List<object>();
+        int start = offset;
         offset += 1;
 
         while (offset < data.Length && data[offset] != (byte)'e')
         {
-            var (elem, used) = DecodeInput(data, offset);
+            var (elem, used) = DecodeInput(data, offset, decodeStringsAsUtf8);
             list.Add(elem);
             offset += used;
         }
@@ -106,7 +108,6 @@ public class BencodeDecoder
         if (offset >= data.Length || data[offset] != (byte)'e')
             throw new FormatException("Unterminated list");
 
-        return (list, offset + 1);
+        return (list, offset - start + 1);
     }
-
 }
