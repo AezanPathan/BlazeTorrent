@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Forms;
 using System.Text;
 
 namespace CodeCrafters.Bittorrent.src;
@@ -110,4 +111,13 @@ public class BencodeDecoder
 
         return (list, offset - start + 1);
     }
+
+    public async Task<byte[]> ReadFileByte(IBrowserFile file)
+    {
+        using var stream = file.OpenReadStream();
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
+    }
+
 }

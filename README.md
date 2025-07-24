@@ -41,3 +41,13 @@ Contains key-value pairs.
 Examples:
 An empty dictionary is encoded as de.
 A dictionary with keys "wiki" ? "bencode" and "meaning" ? 42 is encoded as d7:meaningi42e4:wiki7:bencodee.
+
+# info 
+-- what parse file contains 
+-- get the info and encode it 
+
+steps are the order by the command in code crafters 
+
+# single file torrent multi file torent 
+
+-- look how i add the info length for the multi file support 

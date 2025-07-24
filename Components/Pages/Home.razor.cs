@@ -2,6 +2,8 @@ using BlazeTorrent.Components.Handlers;
 using CodeCrafters.Bittorrent.src;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace BlazeTorrent.Components.Pages;
 
@@ -10,7 +12,7 @@ public partial class Home : ComponentBase
     protected string FileInfo = "";
     private string displayFileName = "Upload a file";
 
-    private Decoder _decoder = new Decoder();
+   // private Decoder _decoder = new Decoder();
     private BencodeDecoder _bencodeDecoder = new BencodeDecoder();
     //alert 
 
@@ -51,7 +53,7 @@ public partial class Home : ComponentBase
             {
                 try
                 {
-                    var fileBytes = await _decoder.ReadFileByte(file);
+                    var fileBytes = await _bencodeDecoder.ReadFileByte(file);
                     (object result, _) = _bencodeDecoder.DecodeInput(fileBytes, 0, decodeStringsAsUtf8: true);
 
                     var meta = (Dictionary<string, object>)result;
@@ -59,31 +61,48 @@ public partial class Home : ComponentBase
 
                     string tracker = (string)meta["announce"];
                     long length = 0;
-                    
-                    // Handle different torrent structures
+
+                    // for the single file torrent files
                     if (infoDict.ContainsKey("length"))
-                    {
                         length = (long)infoDict["length"];
-                    }
-                    else if (infoDict.ContainsKey("files") && infoDict["files"] is List<object> files)
+
+                    // For multi file torrent files 
+                    else if (infoDict.ContainsKey("files"))
                     {
-                        // Multi-file torrent
-                        foreach (var fileObj in files)
-                        {
-                            if (fileObj is Dictionary<string, object> fileDict && fileDict.ContainsKey("length"))
-                            {
-                                length += (long)fileDict["length"];
-                            }
-                        }
+                        var files = (List<object>)infoDict["files"];
+                        length = files.Sum(f => (long)((Dictionary<string, object>)f)["length"]);
                     }
 
-                    string infoText = $"Tracker: {tracker}\nTotal Size: {length:N0} bytes";
-                    if (infoDict.ContainsKey("name"))
-                    {
-                        infoText = $"Name: {(string)infoDict["name"]}\n{infoText}";
-                    }
+                    const string marker = "4:infod";
+                    int markerPosition = BencodeUtils.FindMarkerPosition(fileBytes, marker);
+                    int infoStartIndex = markerPosition + marker.Length - 1;
+                    byte[] infoBytes = fileBytes[infoStartIndex..^1];
+                    byte[] hashBytes = SHA1.HashData(infoBytes);
+                    string infoHash = Convert.ToHexString(hashBytes).ToLower();
 
-                    FileInfo = infoText;
+                    long pieceLength = (long)infoDict["piece length"];
+
+                    const string piecesKey = "6:pieces";
+                    int piecesKeyPos = BencodeUtils.FindMarkerPosition(infoBytes, piecesKey);
+                    int lenStart = piecesKeyPos + piecesKey.Length;
+                    int colonPos = Array.IndexOf(infoBytes, (byte)':', lenStart);
+                    string lenStr = Encoding.ASCII.GetString(infoBytes[lenStart..colonPos]);
+                    if (!int.TryParse(lenStr, out int piecesLen))
+                        throw new InvalidOperationException($"Invalid pieces length: {lenStr}");
+                    int dataStart = colonPos + 1;
+                    byte[] piecesBytes = infoBytes[dataStart..(dataStart + piecesLen)];
+
+                    List<string> pieceHashes = BencodeUtils.ExtractPieceHashes(piecesBytes);
+
+                    Console.WriteLine($"Tracker URL: {tracker}");
+                    Console.WriteLine($"Length: {length}");
+                    Console.WriteLine($"Info Hash: {infoHash}");
+                    Console.WriteLine($"Piece Length: {pieceLength}");
+                    Console.WriteLine("Piece Hashes:");
+                    foreach (var h in pieceHashes) Console.WriteLine(h);
+
+
+                    FileInfo = name;
                     alertMessage = "✓ Torrent file successfully parsed!";
                     alertClass = "alert-success";
                 }
