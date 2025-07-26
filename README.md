@@ -51,3 +51,5 @@ steps are the order by the command in code crafters
 # single file torrent multi file torent 
 
 -- look how i add the info length for the multi file support 
+
+# after the sucessfully handshake we have to send the message for peer 

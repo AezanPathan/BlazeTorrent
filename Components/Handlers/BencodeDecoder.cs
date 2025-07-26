@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components.Forms;
 using System.Text;
 
-namespace CodeCrafters.Bittorrent.src;
+namespace BlazeTorrent.Components.Handlers;
 
 public class BencodeDecoder
 {
@@ -29,13 +29,13 @@ public class BencodeDecoder
         // Find the colon that separates length from data
         // We need to be careful - only look for colon after consecutive digits
         int colonPos = offset;
-        
+
         // First, find where the digits end
         while (colonPos < data.Length && data[colonPos] >= (byte)'0' && data[colonPos] <= (byte)'9')
         {
             colonPos++;
         }
-        
+
         // The next character should be a colon
         if (colonPos >= data.Length || data[colonPos] != (byte)':')
             throw new FormatException($"Invalid bencoded string: expected ':' after length at offset {colonPos}");
@@ -89,7 +89,7 @@ public class BencodeDecoder
         if (offset >= data.Length || data[offset] != (byte)'e')
             throw new FormatException("Unterminated dictionary");
 
-        int consumed = (offset - start + 1);
+        int consumed = offset - start + 1;
         return (dict, consumed);
     }
 
