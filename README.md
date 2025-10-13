@@ -25,3 +25,7 @@ A minimal BitTorrent client built with **Blazor** and **C#**, inspired by the [C
 git clone https://github.com/AezanPathan/blazor-bittorrent-client.git
 cd blazor-bittorrent-client
 dotnet run
+```
+<h2 align="left">Support My Work:</h2>
+<p><a href="https://www.buymeacoffee.com/aezan"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="KiranAminPanjwani" /></a></p><br><br>
+  
